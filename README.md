@@ -9,7 +9,7 @@ bower install
 - The prefix of all the tables is **qz_**
 
 ## Laravel
-- For conventnient, I create the **framework** folder in the root directory and move the Laravel files and folders into here.
+- For convenient, I create the **framework** folder in the root directory and move the Laravel files and folders into here.
 
 - Install Laravel packages: go to the framework folder and run composer command:
 ```
