@@ -35,15 +35,15 @@ DB_PASSWORD=your_password
 php artisan key:generate
 ```
 
-## Laravel Controller
+## Laravel Controllers
 - The controllers are in the **framework/app/Http/Controllers** folder
-- QuizController.php handles for Plain PHP
-- V1Controller.php handles for Rest API called from Vuejs
+- **QuizController**.php handles for Plain PHP
+- **V1Controller.php** handles for Rest API called from Vuejs
 
 ## Laravel Middleware
 - I create the middleware named Cors.php in the **framework/app/Http/Middleware** folder to handle the CORS (Cross-Origin Resource Sharing) if you want to run the Vuejs in other domain or different port(same domain)
 
-## Two version frontend URL and Rest API endpoint:
+## Two versions of frontend URL and Rest API endpoint:
 - Suppose that my Laravel Quiz App is installed in the folder **quiz** under the web root: http://localhost:8080/quiz
 - Plain PHP version:
 ```
