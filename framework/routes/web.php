@@ -29,3 +29,6 @@ Route::post('/user', ['uses' => 'QuizController@postAddUser'])->name('post-add-u
 Route::get('/play-again', ['uses' => 'QuizController@getClearSession'])->name('get-play-again');
 
 Route::get('/thankyou', ['uses' => 'QuizController@getThankyou'])->name('get-thank-you');
+
+
+Route::get('/vue', ['uses' => 'QuizController@getVueQuiz'])->name('get-vue-quiz');

@@ -14,6 +14,7 @@ class V1Controller extends Controller {
         parent::__construct();
     }
 
+    // Get ramdom question
     public function postRandomQuiz(Request $request){
         $question_fields = ['question.id', 'question.question_text'];
         $answer_fields = ['answer.id', 'answer.question_id', 'answer.answer_text'];
@@ -22,6 +23,7 @@ class V1Controller extends Controller {
         
         $count_question = count($question_list);
 
+        // Get the questions that do not contain the question id in the question_list
         if($count_question == 0){
             $entries = Question::select($question_fields)
             ->with(['answers' => function($q) use($answer_fields){
@@ -50,13 +52,16 @@ class V1Controller extends Controller {
 
     }
 
+    // Get result
     public function postResult(Request $request){
         $answer_list = $request->input('answer_list', []);
         
+        // Find answers relies on the answer id list
         $entries = Answer::whereIn('id', $answer_list)
             ->select(['id', 'question_id', 'correct'])
             ->get();
         
+        // Count the correct answer
         $total_correct = 0;
         foreach($entries as $a){
             if($a->correct == 1)
@@ -71,6 +76,8 @@ class V1Controller extends Controller {
         return response()->json($data, 200, [], JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
     }
 
+
+    // Add user info
     public function postAddUser(Request $request){
         $name = $request->input('your_name');
         $email = $request->input('your_email');

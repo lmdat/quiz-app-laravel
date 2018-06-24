@@ -14,26 +14,28 @@ class QuizController extends Controller {
         parent::__construct();
     }
 
+    // Welcome page
     public function getWelcome(){
-        // dd(session()->get('question-list'), session()->get('answer-list'));
         return view(
             'home',
             []
         );
     }
 
+    // Quiz page
     public function getQuiz(Request $request){
 
-        $ql = $request->session()->get('question-list', []);
-        if(count($ql) == config('quiz.TOTAL_QUESTION')){
+        // If the questions is equals the TOTAL_QUESTION in the quiz.php config file
+        // We must redirect user to the result page
+        $question_list = $request->session()->get('question-list', []);
+        if(count($question_list) == config('quiz.TOTAL_QUESTION')){
             return redirect()->route('get-shown-result');
         }
-
-        $question_list = $request->session()->get('question-list', []);
-
+        
         $question_fields = ['question.id', 'question.question_text'];
         $answer_fields = ['answer.id', 'answer.question_id', 'answer.answer_text'];
 
+        // Get the questions that do not contain the question id in the question_list
         if(count($question_list) == 0){
             $entries = Question::select($question_fields)
             ->with(['answers' => function($q) use($answer_fields){
@@ -48,6 +50,7 @@ class QuizController extends Controller {
             }])->get();
         }
                 
+        // Create ramdom question and shuffle the answers of this question
         $rand_question = Vii::randomQuestion($entries->toArray());
         $answers = $rand_question['answers'];
         shuffle($answers);
@@ -64,6 +67,7 @@ class QuizController extends Controller {
         );
     }
 
+    // Receive the submit answer
     public function postQuiz(Request $request){
         $question_count = $request->input('question_count', null);
         if($question_count != null && $question_count >= config('quiz.TOTAL_QUESTION')){
@@ -75,10 +79,11 @@ class QuizController extends Controller {
             return redirect()->route('get-welcome');
         }
 
+        
         $qid = $request->input('question_id', null);
         $answer_id = $request->input('answer', null);
         
-
+        // Add the answered question id to the question-list
         if(!$request->session()->has('question-list')){
             $request->session()->put('question-list', [$qid]);
         }
@@ -88,6 +93,7 @@ class QuizController extends Controller {
             $request->session()->put('question-list', $questions);
         }
 
+        // Add the submit answer id to the answer-list
         if(!$request->session()->has('answer-list')){
             $request->session()->put('answer-list', [$answer_id]);
         }
@@ -97,15 +103,19 @@ class QuizController extends Controller {
             $request->session()->put('answer-list', $answers);
         }
 
+        // If the questions is equals the TOTAL_QUESTION in the quiz.php config file
+        // We must redirect user to the result page
         $ql = $request->session()->get('question-list', []);
         if(count($ql) == config('quiz.TOTAL_QUESTION')){
             $request->session()->put('shown-result', 1);
             return redirect()->route('get-shown-result');
         }
 
+        // If not, we keep continue the quiz
         return redirect()->route('get-quiz');
     }
 
+    // Result page
     public function getShownResult(Request $request){
         if($request->session()->get('shown-result', 0) == 0){
             session()->flush();
@@ -114,12 +124,13 @@ class QuizController extends Controller {
         }
 
         $answers = $request->session()->get('answer-list');
-        
 
+        // Find the answers relies on the id list
         $entries = Answer::whereIn('id', $answers)
             ->select(['id', 'question_id', 'correct'])
             ->get();
         
+        // Count the correct answer
         $total_correct = 0;
         foreach($entries as $a){
             if($a->correct == 1)
@@ -138,6 +149,7 @@ class QuizController extends Controller {
 
     }
 
+    // Add user
     public function postAddUser(Request $request){
         $name = $request->input('your_name');
         $email = $request->input('your_email');
@@ -156,6 +168,7 @@ class QuizController extends Controller {
             ->with('error-message', "Some errors occured. Please try again!");
     }
 
+    // Thankyou page
     public function getThankyou(){
         if(!session()->has('success-message')){
             session()->flush();
@@ -177,6 +190,7 @@ class QuizController extends Controller {
         );
     }
 
+    // For test purpose
     public function getClearSession(){
         session()->flush();
         return redirect()->route('get-quiz');
